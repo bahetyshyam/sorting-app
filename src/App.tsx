@@ -1,15 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Button from './components/Button';
 import Bar from './components/Bar';
 import './App.css';
-
-export type ElementItemColor = 'gray' | 'blue';
-export type ElementItem = {
-  value: number;
-  id: string;
-  color: ElementItemColor;
-};
+import { ElementItem } from './types';
+import { useAppContext } from './contexts/AppContext';
 
 function createRandomNumberArray(
   size: number = 20,
@@ -23,13 +18,15 @@ function createRandomNumberArray(
 }
 
 function App() {
-  const [sortArray, setSortArray] = useState<ElementItem[]>(
-    createRandomNumberArray(),
-  );
-  const [isSorting, setIsSorting] = useState<boolean>(false);
+  const { sortArray, isAppSorting, setIsAppSorting, setSortArray } =
+    useAppContext();
+
+  useEffect(() => {
+    setSortArray(createRandomNumberArray());
+  }, []);
 
   async function bblSort(arr: ElementItem[]) {
-    setIsSorting(true);
+    setIsAppSorting(true);
     for (let i = 0; i < arr.length; i++) {
       // Last i elements are already in place
       for (let j = 0; j < arr.length - i - 1; j++) {
@@ -57,11 +54,12 @@ function App() {
         setSortArray([...arr]);
       }
     }
-    setIsSorting(false);
+    setIsAppSorting(false);
   }
 
   const resetArray = useCallback(() => {
     setSortArray(createRandomNumberArray());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startSorting = () => {
@@ -71,17 +69,24 @@ function App() {
   return (
     <div>
       <div className="flex items-center justify-center">
-        <Button onClick={startSorting} disabled={isSorting}>
+        <Button onClick={startSorting} disabled={isAppSorting}>
           Start
         </Button>
-        <Button onClick={resetArray} disabled={isSorting}>
+        <Button onClick={resetArray} disabled={isAppSorting}>
           Reset
         </Button>
       </div>
 
       <div className="mt-6 flex justify-center">
         {sortArray.map((item) => {
-          return <Bar id={item.id} value={item.value} barColor={item.color} />;
+          return (
+            <Bar
+              key={item.id}
+              id={item.id}
+              value={item.value}
+              barColor={item.color}
+            />
+          );
         })}
       </div>
     </div>

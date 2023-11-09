@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { ElementItemColor } from '../../App';
+import { ElementItemColor } from '../../types';
 
 interface IProps {
   id: string;
