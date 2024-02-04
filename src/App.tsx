@@ -1,10 +1,11 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Button from './components/Button';
 import Bar from './components/Bar';
 import './App.css';
 import { ElementItem } from './types';
 import { useAppContext } from './contexts/AppContext';
+import RangeSlider from './components/RangeSlider';
 
 function createRandomNumberArray(
   size: number = 20,
@@ -18,64 +19,47 @@ function createRandomNumberArray(
 }
 
 function App() {
-  const { sortArray, isAppSorting, setIsAppSorting, setSortArray } =
-    useAppContext();
+  const {
+    sortArray,
+    isAppSorting,
+    arraySize,
+    setSortArray,
+    setArraySize,
+    resetArray,
+    startSorting,
+  } = useAppContext();
 
   useEffect(() => {
     setSortArray(createRandomNumberArray());
   }, []);
 
-  async function bblSort(arr: ElementItem[]) {
-    setIsAppSorting(true);
-    for (let i = 0; i < arr.length; i++) {
-      // Last i elements are already in place
-      for (let j = 0; j < arr.length - i - 1; j++) {
-        // Checking if the item at present iteration
-        // is greater than the next iteration
-        arr[j].color = 'blue';
-        arr[j + 1].color = 'blue';
-        setSortArray([...arr]);
-        if (arr[j].value > arr[j + 1].value) {
-          // If the condition is true
-          // then swap them
-          const temp = arr[j];
-          arr[j] = arr[j + 1];
-          arr[j + 1] = temp;
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              resolve(() => {
-                setSortArray([...arr]);
-              });
-            }, 50);
-          });
-        }
-        arr[j].color = 'gray';
-        arr[j + 1].color = 'gray';
-        setSortArray([...arr]);
-      }
+  function handleStartClick() {
+    if (startSorting) {
+      startSorting();
     }
-    setIsAppSorting(false);
   }
 
-  const resetArray = useCallback(() => {
-    setSortArray(createRandomNumberArray());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const startSorting = () => {
-    bblSort(sortArray);
-  };
+  function handleResetClick() {
+    if (resetArray) {
+      resetArray();
+    }
+  }
 
   return (
     <div>
       <div className="flex items-center justify-center">
-        <Button onClick={startSorting} disabled={isAppSorting}>
+        <Button onClick={handleStartClick} disabled={isAppSorting}>
           Start
         </Button>
-        <Button onClick={resetArray} disabled={isAppSorting}>
+        <Button onClick={handleResetClick} disabled={isAppSorting}>
           Reset
         </Button>
       </div>
+      <RangeSlider
+        value={arraySize}
+        updateArraySize={setArraySize}
+        disabled={isAppSorting}
+      />
 
       <div className="mt-6 flex justify-center">
         {sortArray.map((item) => {
