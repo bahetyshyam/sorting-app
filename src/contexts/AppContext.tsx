@@ -7,48 +7,50 @@ import {
   useEffect,
   useCallback,
 } from 'react';
-import { ElementItem } from '../types';
-import { createRandomNumberArray } from './util';
+import { ElementItem, SortingAlgorithm } from '../types';
+import { createRandomNumberArray, initiateSorting } from './util';
 
 export type AppContextType = {
   sortArray: ElementItem[];
   isAppSorting: boolean;
   arraySize: number;
+  sortingAlgorithm: SortingAlgorithm;
   setSortArray: (sortArray: ElementItem[]) => void;
   setIsAppSorting: (isAppSorting: boolean) => void;
   setArraySize: (arraySize: number) => void;
+  setSortingAlgorithm: (SortingAlgorithm: SortingAlgorithm) => void;
   resetArray?: () => void;
   startSorting?: () => void;
   dispatch: React.Dispatch<ActionType>;
-} | null;
+};
 
-type InitialStateType = {
+type StateType = {
   sortArray: ElementItem[];
   isAppSorting: boolean;
   arraySize: number;
+  sortingAlgorithm: SortingAlgorithm;
 };
 
 type ActionType =
   | { type: 'UPDATE_SORT_ARRAY'; payload: ElementItem[] }
   | { type: 'UPDATE_IS_APP_SORTING'; payload: boolean }
-  | { type: 'UPDATE_ARRAY_SIZE'; payload: number };
+  | { type: 'UPDATE_ARRAY_SIZE'; payload: number }
+  | { type: 'UPDATE_SORTING_ALGORITHM'; payload: SortingAlgorithm };
 
-export const AppContext = createContext<AppContextType>(null);
+export const AppContext = createContext<AppContextType | null>(null);
 
-export function useAppContext() {
+export const useAppContext = () => {
   return useContext(AppContext);
-}
+};
 
-const initialState: InitialStateType = {
+const initialState: StateType = {
   sortArray: [],
   isAppSorting: false,
   arraySize: 20,
+  sortingAlgorithm: 'quickSort',
 };
 
-function reducer(
-  state: InitialStateType,
-  action: ActionType,
-): InitialStateType {
+function reducer(state: StateType, action: ActionType): StateType {
   switch (action.type) {
     case 'UPDATE_SORT_ARRAY': {
       return {
@@ -66,6 +68,12 @@ function reducer(
       return {
         ...state,
         arraySize: action.payload,
+      };
+    }
+    case 'UPDATE_SORTING_ALGORITHM': {
+      return {
+        ...state,
+        sortingAlgorithm: action.payload,
       };
     }
     default:
@@ -87,6 +95,9 @@ export const AppProvider: FC<IProps> = ({ children }) => {
   const updateArraySize = (arraySize: number) => {
     dispatch({ type: 'UPDATE_ARRAY_SIZE', payload: arraySize });
   };
+  const updateSortingAlgorithm = (sortingAlgorithm: SortingAlgorithm) => {
+    dispatch({ type: 'UPDATE_SORTING_ALGORITHM', payload: sortingAlgorithm });
+  };
 
   useEffect(() => {
     resetArray();
@@ -96,53 +107,29 @@ export const AppProvider: FC<IProps> = ({ children }) => {
     resetArray();
   }, [state.arraySize]);
 
-  async function bblSort(arr: ElementItem[]) {
-    updateIsAppSorting(true);
-    for (let i = 0; i < arr.length; i++) {
-      // Last i elements are already in place
-      for (let j = 0; j < arr.length - i - 1; j++) {
-        // Checking if the item at present iteration
-        // is greater than the next iteration
-        arr[j].color = 'blue';
-        arr[j + 1].color = 'blue';
-        updateSortArray([...arr]);
-        if (arr[j].value > arr[j + 1].value) {
-          // If the condition is true
-          // then swap them
-          const temp = arr[j];
-          arr[j] = arr[j + 1];
-          arr[j + 1] = temp;
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              resolve(() => {
-                updateSortArray([...arr]);
-              });
-            }, 10);
-          });
-        }
-        arr[j].color = 'gray';
-        arr[j + 1].color = 'gray';
-        updateSortArray([...arr]);
-      }
-    }
-    updateIsAppSorting(false);
-  }
-
   const resetArray = useCallback(() => {
     updateSortArray(createRandomNumberArray(state.arraySize));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.arraySize]);
 
   const startSorting = () => {
-    bblSort(state.sortArray);
+    initiateSorting({
+      sortArray: state.sortArray,
+      updateIsAppSorting,
+      updateSortArray,
+      sortingAlgorithm: state.sortingAlgorithm,
+    });
+    // bblSort(state.sortArray);
   };
   const value: AppContextType = {
     sortArray: state.sortArray,
     isAppSorting: state.isAppSorting,
     arraySize: state.arraySize,
+    sortingAlgorithm: state.sortingAlgorithm,
     setSortArray: updateSortArray,
     setIsAppSorting: updateIsAppSorting,
     setArraySize: updateArraySize,
+    setSortingAlgorithm: updateSortingAlgorithm,
     resetArray,
     startSorting,
     dispatch,

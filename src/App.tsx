@@ -1,33 +1,40 @@
-import { useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useEffect, useMemo } from 'react';
 import Button from './components/Button';
 import Bar from './components/Bar';
 import './App.css';
-import { ElementItem } from './types';
-import { useAppContext } from './contexts/AppContext';
+import { AppContextType, useAppContext } from './contexts/AppContext';
 import RangeSlider from './components/RangeSlider';
+import RadioButtons from './components/RadioButtons';
+import { createRandomNumberArray } from './contexts/util';
+import { SortingAlgorithm } from './types';
 
-function createRandomNumberArray(
-  size: number = 20,
-  upperLimit: number = 100,
-): ElementItem[] {
-  return Array.from({ length: size }, () => ({
-    value: Math.floor(Math.random() * upperLimit),
-    id: uuidv4(),
-    color: 'gray',
-  }));
-}
+const radioButtonItems = [
+  {
+    id: 'bubbleSort',
+    value: 'bubbleSort',
+    label: 'Bubble Sort',
+    isDefault: false,
+  },
+  {
+    id: 'quickSort',
+    value: 'quickSort',
+    label: 'Quick Sort',
+    isDefault: false,
+  },
+];
 
 function App() {
   const {
     sortArray,
     isAppSorting,
     arraySize,
+    sortingAlgorithm,
     setSortArray,
     setArraySize,
+    setSortingAlgorithm,
     resetArray,
     startSorting,
-  } = useAppContext();
+  } = useAppContext() as AppContextType;
 
   useEffect(() => {
     setSortArray(createRandomNumberArray());
@@ -45,6 +52,20 @@ function App() {
     }
   }
 
+  const radioItemsProps = useMemo(() => {
+    const radioItems = radioButtonItems.map((item) => {
+      return {
+        ...item,
+        isDefault: item.value === sortingAlgorithm,
+      };
+    });
+    return radioItems;
+  }, [sortingAlgorithm]);
+
+  function onChangeRadioButton(value: string) {
+    setSortingAlgorithm(value as SortingAlgorithm);
+  }
+
   return (
     <div>
       <div className="flex items-center justify-center">
@@ -55,6 +76,10 @@ function App() {
           Reset
         </Button>
       </div>
+      <RadioButtons
+        radioItems={radioItemsProps}
+        onChange={onChangeRadioButton}
+      />
       <RangeSlider
         value={arraySize}
         updateArraySize={setArraySize}
@@ -69,6 +94,7 @@ function App() {
               id={item.id}
               value={item.value}
               barColor={item.color}
+              isPivot={item.isPivot}
             />
           );
         })}
