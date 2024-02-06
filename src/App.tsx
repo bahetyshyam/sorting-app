@@ -29,9 +29,11 @@ function App() {
     isAppSorting,
     arraySize,
     sortingAlgorithm,
+    sortingSpeed,
     setSortArray,
     setArraySize,
     setSortingAlgorithm,
+    setSortingSpeed,
     resetArray,
     startSorting,
   } = useAppContext() as AppContextType;
@@ -65,6 +67,12 @@ function App() {
   function onChangeRadioButton(value: string) {
     setSortingAlgorithm(value as SortingAlgorithm);
   }
+  function onChangeRangeSlider(value: number) {
+    setArraySize(value);
+  }
+  function onChangeSortingSpeedRangeSlider(value: number) {
+    setSortingSpeed(value);
+  }
 
   return (
     <div>
@@ -79,11 +87,29 @@ function App() {
       <RadioButtons
         radioItems={radioItemsProps}
         onChange={onChangeRadioButton}
+        disabled={isAppSorting}
       />
       <RangeSlider
         value={arraySize}
-        updateArraySize={setArraySize}
+        onChange={onChangeRangeSlider}
         disabled={isAppSorting}
+        labelRenderFunction={() => (
+          <div className="text-base font-medium text-gray-900">
+            Array Size {arraySize}
+          </div>
+        )}
+      />
+      <RangeSlider
+        value={sortingSpeed}
+        onChange={onChangeSortingSpeedRangeSlider}
+        disabled={isAppSorting}
+        min={10}
+        max={500}
+        labelRenderFunction={() => (
+          <div className="text-base font-medium text-gray-900">
+            Sorting Speed {sortingSpeed} ms
+          </div>
+        )}
       />
 
       <div className="mt-6 flex justify-center">

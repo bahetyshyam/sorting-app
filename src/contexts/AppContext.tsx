@@ -15,10 +15,12 @@ export type AppContextType = {
   isAppSorting: boolean;
   arraySize: number;
   sortingAlgorithm: SortingAlgorithm;
+  sortingSpeed: number; //milliseconds
   setSortArray: (sortArray: ElementItem[]) => void;
   setIsAppSorting: (isAppSorting: boolean) => void;
   setArraySize: (arraySize: number) => void;
   setSortingAlgorithm: (SortingAlgorithm: SortingAlgorithm) => void;
+  setSortingSpeed: (speed: number) => void;
   resetArray?: () => void;
   startSorting?: () => void;
   dispatch: React.Dispatch<ActionType>;
@@ -29,13 +31,15 @@ type StateType = {
   isAppSorting: boolean;
   arraySize: number;
   sortingAlgorithm: SortingAlgorithm;
+  sortingSpeed: number;
 };
 
 type ActionType =
   | { type: 'UPDATE_SORT_ARRAY'; payload: ElementItem[] }
   | { type: 'UPDATE_IS_APP_SORTING'; payload: boolean }
   | { type: 'UPDATE_ARRAY_SIZE'; payload: number }
-  | { type: 'UPDATE_SORTING_ALGORITHM'; payload: SortingAlgorithm };
+  | { type: 'UPDATE_SORTING_ALGORITHM'; payload: SortingAlgorithm }
+  | { type: 'UPDATE_SORTING_SPEED'; payload: number };
 
 export const AppContext = createContext<AppContextType | null>(null);
 
@@ -47,7 +51,8 @@ const initialState: StateType = {
   sortArray: [],
   isAppSorting: false,
   arraySize: 20,
-  sortingAlgorithm: 'quickSort',
+  sortingAlgorithm: 'bubbleSort',
+  sortingSpeed: 50,
 };
 
 function reducer(state: StateType, action: ActionType): StateType {
@@ -76,6 +81,12 @@ function reducer(state: StateType, action: ActionType): StateType {
         sortingAlgorithm: action.payload,
       };
     }
+    case 'UPDATE_SORTING_SPEED': {
+      return {
+        ...state,
+        sortingSpeed: action.payload,
+      };
+    }
     default:
       throw new Error();
   }
@@ -98,6 +109,9 @@ export const AppProvider: FC<IProps> = ({ children }) => {
   const updateSortingAlgorithm = (sortingAlgorithm: SortingAlgorithm) => {
     dispatch({ type: 'UPDATE_SORTING_ALGORITHM', payload: sortingAlgorithm });
   };
+  const updateSortingSpeed = (sortingSpeed: number) => {
+    dispatch({ type: 'UPDATE_SORTING_SPEED', payload: sortingSpeed });
+  };
 
   useEffect(() => {
     resetArray();
@@ -118,18 +132,20 @@ export const AppProvider: FC<IProps> = ({ children }) => {
       updateIsAppSorting,
       updateSortArray,
       sortingAlgorithm: state.sortingAlgorithm,
+      sortingSpeed: state.sortingSpeed,
     });
-    // bblSort(state.sortArray);
   };
   const value: AppContextType = {
     sortArray: state.sortArray,
     isAppSorting: state.isAppSorting,
     arraySize: state.arraySize,
     sortingAlgorithm: state.sortingAlgorithm,
+    sortingSpeed: state.sortingSpeed,
     setSortArray: updateSortArray,
     setIsAppSorting: updateIsAppSorting,
     setArraySize: updateArraySize,
     setSortingAlgorithm: updateSortingAlgorithm,
+    setSortingSpeed: updateSortingSpeed,
     resetArray,
     startSorting,
     dispatch,

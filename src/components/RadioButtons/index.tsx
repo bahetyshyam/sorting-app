@@ -3,6 +3,7 @@ import React, { useEffect, useId, useMemo, useState } from 'react';
 interface IProps {
   radioItems: RadioItemsType[];
   onChange?: (radioValue: string) => void;
+  disabled?: boolean;
 }
 
 type RadioItemsType = {
@@ -12,7 +13,7 @@ type RadioItemsType = {
   isDefault?: boolean;
 };
 
-const RadioButtons: React.FC<IProps> = ({ radioItems, onChange }) => {
+const RadioButtons: React.FC<IProps> = ({ radioItems, onChange, disabled }) => {
   const defaultRadioValue = useMemo(() => {
     if (radioItems.length === 0) {
       return '';
@@ -46,10 +47,11 @@ const RadioButtons: React.FC<IProps> = ({ radioItems, onChange }) => {
               value={value}
               name={nameForRadio}
               className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-blue-600"
+              disabled={disabled}
             />
             <label
               htmlFor={id}
-              className="ms-2 cursor-pointer text-base font-medium text-gray-900 dark:text-gray-300"
+              className="text-gray-90 ms-2 cursor-pointer text-base font-medium"
             >
               {label}
             </label>

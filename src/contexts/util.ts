@@ -1,6 +1,10 @@
 import { ElementItem, SortingAlgorithm } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
+function delay(time: number) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 function createRandomNumberExceptZero(upperLimit: number) {
   let randomNumber;
   do {
@@ -25,6 +29,7 @@ interface SortArrayParams {
   updateIsAppSorting: (isAppSorting: boolean) => void;
   updateSortArray: (sortArray: ElementItem[]) => void;
   sortingAlgorithm: SortingAlgorithm;
+  sortingSpeed: number;
 }
 export function initiateSorting(sortArrayParamsObject: SortArrayParams) {
   const { sortingAlgorithm } = sortArrayParamsObject;
@@ -44,6 +49,7 @@ async function bubbleSort({
   sortArray,
   updateIsAppSorting,
   updateSortArray,
+  sortingSpeed,
 }: SortArrayParams) {
   updateIsAppSorting(true);
   for (let i = 0; i < sortArray.length; i++) {
@@ -54,23 +60,21 @@ async function bubbleSort({
       sortArray[j].color = 'blue';
       sortArray[j + 1].color = 'blue';
       updateSortArray([...sortArray]);
+      await delay(sortingSpeed);
+
       if (sortArray[j].value > sortArray[j + 1].value) {
         // If the condition is true
         // then swap them
         const temp = sortArray[j];
         sortArray[j] = sortArray[j + 1];
         sortArray[j + 1] = temp;
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(() => {
-              updateSortArray([...sortArray]);
-            });
-          }, 10);
-        });
+        updateSortArray([...sortArray]);
+        await delay(sortingSpeed);
       }
       sortArray[j].color = 'gray';
       sortArray[j + 1].color = 'gray';
       updateSortArray([...sortArray]);
+      await delay(sortingSpeed);
     }
   }
   updateIsAppSorting(false);
@@ -80,6 +84,7 @@ async function initiateQuickSort({
   sortArray,
   updateIsAppSorting,
   updateSortArray,
+  sortingSpeed,
 }: SortArrayParams) {
   async function swap(
     items: ElementItem[],
@@ -90,41 +95,33 @@ async function initiateQuickSort({
     items[leftIndex] = items[rightIndex];
     items[rightIndex] = temp;
     updateSortArray([...items]);
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(() => {
-          updateSortArray([...sortArray]);
-        });
-      }, 1000);
-    });
+    await delay(sortingSpeed);
   }
   async function partition(items: ElementItem[], left: number, right: number) {
     const pivot = items[Math.floor((right + left) / 2)]; //middle element
     pivot.isPivot = true;
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(() => {
-          updateSortArray([...sortArray]);
-        });
-      }, 1000);
-    });
+    updateSortArray([...items]);
+    await delay(sortingSpeed);
     let i = left; //left pointer
     let j = right; //right pointer
     items[i].color = 'blue';
     items[j].color = 'blue';
     updateSortArray([...items]);
+    await delay(sortingSpeed);
     while (i <= j) {
       while (items[i].value < pivot.value) {
         items[i].color = 'gray';
         i++;
         items[i].color = 'blue';
         updateSortArray([...items]);
+        await delay(sortingSpeed);
       }
       while (items[j].value > pivot.value) {
         items[j].color = 'gray';
         j--;
         items[j].color = 'blue';
         updateSortArray([...items]);
+        await delay(sortingSpeed);
       }
       if (i <= j) {
         await swap(items, i, j); //swapping two elements
@@ -142,6 +139,7 @@ async function initiateQuickSort({
       items[j].color = 'gray';
     }
     updateSortArray([...items]);
+    await delay(sortingSpeed);
     pivot.isPivot = false;
     return i;
   }
