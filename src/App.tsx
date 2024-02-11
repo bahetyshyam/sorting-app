@@ -7,6 +7,11 @@ import RangeSlider from './components/RangeSlider';
 import RadioButtons from './components/RadioButtons';
 import { createRandomNumberArray } from './contexts/util';
 import { SortingAlgorithm } from './types';
+import ReactGA from 'react-ga4';
+
+if (import.meta.env.MODE !== 'development') {
+  ReactGA.initialize('G-M86E743H4X');
+}
 
 const radioButtonItems = [
   {
