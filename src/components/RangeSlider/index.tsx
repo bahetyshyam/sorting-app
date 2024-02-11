@@ -1,4 +1,5 @@
-import React from 'react';
+import classNames from 'classnames';
+import React, { useMemo } from 'react';
 
 interface IProps {
   value?: number;
@@ -6,6 +7,7 @@ interface IProps {
   disabled: boolean;
   min?: number;
   max?: number;
+  extraInputClasses?: string[];
   labelRenderFunction?: () => React.ReactNode;
 }
 
@@ -15,8 +17,19 @@ const RangeSlider: React.FC<IProps> = ({
   disabled,
   min,
   max,
+  extraInputClasses,
   labelRenderFunction,
 }) => {
+  if (extraInputClasses) {
+    console.log(...extraInputClasses);
+  }
+  const baseInputClass =
+    'mr-4 h-2 w-1/4 cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700';
+  const inputClass = useMemo(() => {
+    return classNames(baseInputClass, [
+      extraInputClasses ? extraInputClasses : [],
+    ]);
+  }, [extraInputClasses]);
   const onSliderValueChange = (e: React.FormEvent<HTMLInputElement>) => {
     onChange(parseInt(e.currentTarget.value));
   };
@@ -30,7 +43,7 @@ const RangeSlider: React.FC<IProps> = ({
         min={min || 20}
         max={max || 50}
         value={value}
-        className="mr-4 h-2 w-1/4 cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
+        className={inputClass}
         disabled={disabled}
       ></input>
     </div>

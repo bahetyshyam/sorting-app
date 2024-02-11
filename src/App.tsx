@@ -104,7 +104,8 @@ function App() {
         onChange={onChangeSortingSpeedRangeSlider}
         disabled={isAppSorting}
         min={10}
-        max={500}
+        max={200}
+        extraInputClasses={['rotate-180']}
         labelRenderFunction={() => (
           <div className="text-base font-medium text-gray-900">
             Sorting Speed {sortingSpeed} ms

@@ -51,7 +51,7 @@ const initialState: StateType = {
   sortArray: [],
   isAppSorting: false,
   arraySize: 20,
-  sortingAlgorithm: 'bubbleSort',
+  sortingAlgorithm: 'quickSort',
   sortingSpeed: 50,
 };
 
